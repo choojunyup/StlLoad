@@ -5,6 +5,7 @@
     <uses-feature android:required="true" android:glEsVersion="0x00020000"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission."/>
 
     <application
         android:allowBackup="true"
@@ -15,12 +16,21 @@
         <activity android:name=".FileFinderActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <activity android:name=".OpenGLES20Activity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" android:host="*"  android:pathPattern=".*\\.stl" android:mimeType="*/*"/>
+                <data android:scheme="file" android:host="*"  android:pathPattern=".*\\.STL" android:mimeType="*/*"/>
+
+            </intent-filter>
+
         </activity>
     </application>
 

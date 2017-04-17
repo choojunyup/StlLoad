@@ -41,16 +41,16 @@ public class stlASCiiParser extends paser{
         vectexs_min_max = new float[6];  // xmin,xmax,ymin,ymax,zmin,zmax
         center = new float[3];
 
-        ASCiiParser(file.toString(),normals,vectors,vectexs_min_max);
+        ASCiiParser(file.toString(),normals,vectors,vectexs_min_max,center);
         /*
         Log.i("stl- view-","ok- "+nor_Count);
         Log.i("stl- view-","--x= "+abs(vectexs_min_max[0]-vectexs_min_max[1]));
         Log.i("stl- view-","--y= "+abs(vectexs_min_max[2]-vectexs_min_max[3]));
         Log.i("stl- view-","--z= "+abs(vectexs_min_max[4]-vectexs_min_max[5]));
         */
-        center[0]= (vectexs_min_max[1]+vectexs_min_max[0])/2;
-        center[1]= (vectexs_min_max[3]+vectexs_min_max[2])/2;
-        center[2]= (vectexs_min_max[5]+vectexs_min_max[4])/2;
+        //center[0]= (vectexs_min_max[1]+vectexs_min_max[0])/2;
+        //center[1]= (vectexs_min_max[3]+vectexs_min_max[2])/2;
+        //center[2]= (vectexs_min_max[5]+vectexs_min_max[4])/2;
 
 
     }
@@ -72,7 +72,7 @@ public class stlASCiiParser extends paser{
     }
 
     private native int facas(String s);
-    private native void ASCiiParser(String s, float[] nor, float[] ver, float[] ver_min_max);
+    private native void ASCiiParser(String s, float[] nor, float[] ver, float[] ver_min_max,float[] center);
 
 
 }

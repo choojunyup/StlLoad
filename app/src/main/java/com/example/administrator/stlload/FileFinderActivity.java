@@ -23,6 +23,7 @@ public class FileFinderActivity extends AppCompatActivity {
     private ListView mFileList;
     private ArrayList<ListItem> lTemp = null;
     private String mRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
+    //private String mRoot = Environment.getRootDirectory().getAbsolutePath();
     private TextView mPath;
     private ListViewAdapter mAdapter = null;
     private String mDirPath;
@@ -32,6 +33,10 @@ public class FileFinderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //String ext = Environment.getExternalStorageState();
+        //if(!ext.equals(Environment.MEDIA_MOUNTED)){mRoot = Environment.getRootDirectory().getAbsolutePath();}
+        //else{mRoot = Environment.getExternalStorageDirectory().getAbsolutePath();}
 
         mPath = (TextView)findViewById(R.id.tvPath);
         mFileList = (ListView)findViewById(R.id.filelist);
@@ -51,10 +56,9 @@ public class FileFinderActivity extends AppCompatActivity {
                     if(file.canRead()){
                         getDir(fileInfo.getFilePath());
                     }else{
-                        Toast.makeText(FileFinderActivity.this, "No files in this folder.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(FileFinderActivity.this, "good bye~", Toast.LENGTH_SHORT).show();
                     }
                 }else{
-                    Toast.makeText(FileFinderActivity.this, "Path = " + fileInfo.getFilePath() + ", File = " + fileInfo.getFileName(), Toast.LENGTH_LONG).show();
                     stlLoad.putExtra("stl_path",fileInfo.getFilePath());
                     startActivity(stlLoad);
                 }
@@ -134,7 +138,7 @@ public class FileFinderActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(mRoot.equals(mDirPath)){            //if rootDirectory   app finish!!!!
-            Toast.makeText(FileFinderActivity.this, "back press", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(FileFinderActivity.this, "bye~", Toast.LENGTH_SHORT).show();
             finish();
         }else{
             FileInfo fileInfo = (FileInfo)mAdapter.getItem(0);
@@ -147,22 +151,4 @@ public class FileFinderActivity extends AppCompatActivity {
         }
     }
 
-    private class ListItem {
-        private String name;
-        private String path;
-
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-        public String getPath() {
-            return path;
-        }
-        public void setPath(String path) {
-            this.path = path;
-        }
-
-    }
 }

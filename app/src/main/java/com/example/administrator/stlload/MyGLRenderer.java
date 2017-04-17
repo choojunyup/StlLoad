@@ -7,7 +7,6 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
-import static java.lang.Math.abs;
 
 public class MyGLRenderer implements GLSurfaceView.Renderer {
 
@@ -20,16 +19,25 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
     private final float[] mRotationMatrix = new float[16];
-    private float[] mScaleMatrix = new float[16];
+    private final float[] mAccumulatedRotation = new float[16];
+    private float[] mTemporaryMatrix = new float[16];
+    private float[] mModelMatrix = new float[16];
+    float[] scratch_1 = new float[16];
+    float[] scratch_2 = new float[16];
 
-    private float mAngleX = 0.0f;
-    private float mAngleY = 0.0f;
-    private float mSize = -6.0f;
+    float mAngleX = 0.0f;
+    float mAngleY = 0.0f;
+    float mAngleZ = 0.0f;
+
     private float mMoveX = 0.0f;
     private float mMoveY = 0.0f;
 
+    private float cameraX = 0;
+    private float cameraY = 0;
+    private float cameraZ = 3.0f;
+
     private float[] centerPointXYZ;    //3
-    private float[] objectPointXYZ;    //6
+
 
 
     public MyGLRenderer(stlPaser StlObject){
@@ -40,48 +48,71 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
 
         // Set the background frame color
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        GLES20.glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_CULL_FACE);
 
         centerPointXYZ = StlObject.getCenterPoint();
-        objectPointXYZ = StlObject.getXYZ();
-
-        /*
-        objectSizeXYZ[0]= abs(objectPointXYZ[0]-objectPointXYZ[1]);   //X_size
-        objectSizeXYZ[1]= abs(objectPointXYZ[2]-objectPointXYZ[3]);   //Y_size
-        objectSizeXYZ[2]= abs(objectPointXYZ[4]-objectPointXYZ[5]);   //Z_size
-        */
-        //averageSize =(abs(objectPointXYZ[0]-objectPointXYZ[1])+abs(objectPointXYZ[2]-objectPointXYZ[3])+abs(objectPointXYZ[4]-objectPointXYZ[5]))/3;
-
         ObjectModel = new Objectmodel(StlObject);
+
+        Matrix.setIdentityM(mAccumulatedRotation, 0);
+
+
     }
 
     @Override
     public void onDrawFrame(GL10 unused) {
-        float[] scratch = new float[16];
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-
-        Matrix.setLookAtM(mViewMatrix, 0, 0, 0, mSize, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        cameraX = mMoveX;
+        cameraY = -mMoveY;
+        Matrix.setLookAtM(mViewMatrix, 0, cameraX, cameraY, cameraZ, mMoveX,-mMoveY, 0, 0.0f, 1.0f, 0.0f);
+        /*
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
         Matrix.setIdentityM(mRotationMatrix, 0);
-        Matrix.rotateM(mRotationMatrix, 0, -mAngleY, 1, 0, 0); //z축
-        Matrix.rotateM(mRotationMatrix, 0, -mAngleX, 0, 1, 0); //y축
-
-        Matrix.setIdentityM(mScaleMatrix, 0);
-        //Matrix.scaleM(mScaleMatrix,0,1/averageSize,1/averageSize,1/averageSize);
-        //Matrix.scaleM(mScaleMatrix,0,0.2f,0.2f,0.2f);
-        Matrix.multiplyMM(mMVPMatrix, 0, mMVPMatrix, 0, mScaleMatrix, 0);
-
+        Matrix.rotateM(mRotationMatrix, 0, mAngleX, 0, 1, 0); //X axis
+        Matrix.rotateM(mRotationMatrix, 0, mAngleY, 1, 0, 0); //Y axis
+        //mAngleY = 0.0f;
+        //mAngleX = 0.0f;
         Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
-
-        //Matrix.scaleM(scratch,0,0.5f,0.5f,0.5f);
         Matrix.translateM(scratch,0,-centerPointXYZ[0],-centerPointXYZ[1],-centerPointXYZ[2]);
+        */
+
+        /////////////////////////////////////////
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+
+        Matrix.setIdentityM(mRotationMatrix, 0);
+        Matrix.rotateM(mRotationMatrix, 0, -mAngleY, 1, 0, 0); //y axis
+        Matrix.rotateM(mRotationMatrix, 0, -mAngleX, 0, 1, 0); //x axis
+        Matrix.rotateM(mRotationMatrix, 0, -mAngleZ, 0, 0, 1); //z axis
+        mAngleY = 0.0f;
+        mAngleX = 0.0f;
+        mAngleZ = 0.0f;
+
+        Matrix.multiplyMM(mTemporaryMatrix, 0, mRotationMatrix, 0, mAccumulatedRotation, 0);
+        System.arraycopy(mTemporaryMatrix, 0, mAccumulatedRotation, 0, 16);
+
+        // Rotate the cube taking the overall rotation into account.
+        Matrix.multiplyMM(mTemporaryMatrix, 0, mModelMatrix, 0, mAccumulatedRotation, 0);
+        System.arraycopy(mTemporaryMatrix, 0, mModelMatrix, 0, 16);
+
+        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+        System.arraycopy(mMVPMatrix, 0, scratch_1, 0, 16);
+
+        Matrix.multiplyMM(mTemporaryMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+        System.arraycopy(mTemporaryMatrix, 0, mMVPMatrix, 0, 16);
+        System.arraycopy(mMVPMatrix, 0, scratch_2, 0, 16);
+
+        Matrix.translateM(scratch_2, 0,-centerPointXYZ[0],-centerPointXYZ[1],-centerPointXYZ[2]);
 
 
-        ObjectModel.draw(scratch,mSize);
+        /////////////////////////////////////////
+
+        ObjectModel.draw(scratch_1,scratch_2,cameraZ);
+
+        //Log.i("stl-","change");
     }
 
     @Override
@@ -92,10 +123,10 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         final float ratio = (float) width / height;
         final float left = -ratio;
         final float right = ratio;
-        final float bottom = -1.0f;
-        final float top = 1.0f;
-        final float near = 1.0f;
-        final float far = 300.0f;
+        final float bottom = -1;
+        final float top = 1;
+        final float near = 1;
+        final float far = 50;
 
         Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
     }
@@ -125,10 +156,12 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     }
     public void setAngleX(float angleX) {
         mAngleX = angleX;
+
         if(mAngleX >=360.0f || mAngleX <= -360.0f){
             mAngleX=0.0f;
         }
-        //Log.i("stl-","mAngleX:"+mAngleX);
+
+        //Log.i("stl-","cameraZ:"+cameraZ);
     }
 
     public float getAngleY() {
@@ -136,18 +169,33 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     }
     public void setAngleY(float angleY) {
         mAngleY = angleY;
+
         if(mAngleY >=360.0f || mAngleY <= -360.0f){
             mAngleY=0.0f;
         }
-        //Log.i("stl-","mAngleX:"+mAngleY);
+        //Log.i("stl-","cameraY:"+cameraY);
+    }
+
+    public float getAngleZ() {
+        return mAngleZ;
+    }
+    public void setAngleZ(float angleZ) {
+        mAngleZ = angleZ;
+
+        if(mAngleZ >=360.0f || mAngleZ <= -360.0f){
+            mAngleZ=0.0f;
+        }
+        //Log.i("stl-","mAngleZ:"+mAngleZ);
     }
 
     public float getSize() {
-        return mSize;
+        return cameraZ;
     }
     public void setSize(float size) {
-        mSize = size;
-        Log.i("stl-","mSize:"+mSize);
+        cameraZ = size;
+        /*
+        Log.i("stl-","mSize:"+focus);
+        */
     }
 
     public float getMoveX() {
@@ -155,6 +203,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     }
     public void setMoveX(float moveX) {
         mMoveX = moveX;
+
+        //Log.i("stl-","moveX:"+mMoveX);
     }
 
     public float getMoveY() {
@@ -162,6 +212,29 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     }
     public void setMoveY(float moveY) {
         mMoveY = moveY;
+
+        //Log.i("stl-","moveY:"+mMoveY);
     }
+
+    public void ObjectRecovery(){
+        mMoveX = 0.0f;
+        mMoveY = 0.0f;
+        cameraX = 0;
+        cameraY = 0;
+        cameraZ = 3.0f;
+
+        Matrix.setIdentityM(mRotationMatrix, 0);
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.setIdentityM(mMVPMatrix, 0);
+        Matrix.setIdentityM(mViewMatrix, 0);
+        Matrix.setIdentityM(mTemporaryMatrix, 0);
+        Matrix.setIdentityM(mAccumulatedRotation, 0);
+
+        Matrix.setIdentityM(scratch_1,0);
+        Matrix.setIdentityM(scratch_2,0);
+
+
+    }
+
 
 }

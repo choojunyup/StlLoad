@@ -6,9 +6,6 @@ import java.nio.FloatBuffer;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-/**
- * A two-dimensional triangle for use as a drawn object in OpenGL ES 2.0.
- */
 public class Objectmodel {
 
     private final String vertexShaderCode =
@@ -27,7 +24,7 @@ public class Objectmodel {
                             "float distance = length(uLightPos - modelViewVertex);"+
                             "vec3 lightVector = normalize(uLightPos - modelViewVertex);"+
                             "float diffuse = max(dot(modelViewNormal, lightVector), 0.1);"+
-                            "diffuse = diffuse * (1.0 / (1.0 + (0.06 * distance * distance)));"+
+                            "diffuse = diffuse * (1.0 / (1.0 + (0.08 * distance * distance)));"+
                             "uColor = vColor * (0.6 + diffuse);"+
                             "gl_Position = uMVPMatrix * vPosition;" +
                     "}";
@@ -58,7 +55,7 @@ public class Objectmodel {
     static final int FLOAT_BYTE_SIZE = 4;
 
     int vertexCount;
-    private float color[] = { 0.6f, 0.6f, 0.6f, 0.8f };
+    private float color[] = { 0.4f, 0.4f, 0.4f, 1.0f };  //object color
 
     stlPaser stl;
     /**
@@ -89,7 +86,7 @@ public class Objectmodel {
 
     }
 
-    public void draw(float[] mvpMatrix,float mSize) {
+    public void draw(float[] mvMatrix,float[] mvpMatrix1,float mSize) {
         // Add program to OpenGL environment
         GLES20.glUseProgram(mProgram);
 
@@ -102,9 +99,9 @@ public class Objectmodel {
 
 
         GLES20.glUniform4fv(mColorHandle, 1, color, 0);
-        GLES20.glUniformMatrix4fv(mMVMatrixHandle, 1, false, mvpMatrix, 0);
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
-        GLES20.glUniform3f(mLightPosHandle, 0f, 0f,mSize);
+        GLES20.glUniformMatrix4fv(mMVMatrixHandle, 1, false, mvMatrix, 0);
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix1, 0);
+        GLES20.glUniform3f(mLightPosHandle, 0, 0 ,mSize);
 
 
         //vboUnUseRun();
@@ -162,7 +159,7 @@ public class Objectmodel {
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0,vertexCount);
     }
 
-    private void vboUnUseRun(){
+    private void vboUnUseRun(){    //now use
         vertexBuffer.position(0);
         normalBuffer.position(0);
 

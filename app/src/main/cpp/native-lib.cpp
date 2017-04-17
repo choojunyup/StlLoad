@@ -31,12 +31,13 @@ JNIEXPORT  int Java_com_example_administrator_stlload_stlASCiiParser_facas(
 
 JNIEXPORT void Java_com_example_administrator_stlload_stlASCiiParser_ASCiiParser(
         JNIEnv *env,
-        jobject obj, jstring filename,jfloatArray n ,jfloatArray v,jfloatArray vm) {
+        jobject obj, jstring filename,jfloatArray n ,jfloatArray v,jfloatArray xyz,jfloatArray centerxyz) {
 
     const char *fileRoot = (*env).GetStringUTFChars(filename, NULL);
     float* normal_array = (*env).GetFloatArrayElements(n,NULL);
     float* vertex_array = (*env).GetFloatArrayElements(v,NULL);
-    float* vertex_min_max = (*env).GetFloatArrayElements(vm,NULL);
+    float* vertex_min_max = (*env).GetFloatArrayElements(xyz,NULL);
+    float* vertex_centerxyz = (*env).GetFloatArrayElements(centerxyz,NULL);
 
     float Xmin = 0, Xmax = 0;
     float Ymin = 0, Ymax = 0;
@@ -102,36 +103,50 @@ JNIEXPORT void Java_com_example_administrator_stlload_stlASCiiParser_ASCiiParser
         }
 
     }
+
+
     average_size = (fabsf(Xmax-Xmin)+fabsf(Ymax-Ymin)+fabsf(Zmax-Zmin))/3;
 
     for(int i = 0 ; i < vertec_counter*3 ; i++){
-        vertex_array[i] = vertex_array[i]/average_size;
+        vertex_array[i] = (vertex_array[i]/average_size)*2;
     }
-    vertex_min_max[0] = Xmin/average_size;
-    vertex_min_max[1] = Xmax/average_size;
-    vertex_min_max[2] = Ymin/average_size;
-    vertex_min_max[3] = Ymax/average_size;
-    vertex_min_max[4] = Zmin/average_size;
-    vertex_min_max[5] = Zmax/average_size;
 
+
+    vertex_min_max[0] = Xmin;
+    vertex_min_max[1] = Xmax;
+    vertex_min_max[2] = Ymin;
+    vertex_min_max[3] = Ymax;
+    vertex_min_max[4] = Zmin;
+    vertex_min_max[5] = Zmax;
+
+
+    //vertex_centerxyz[0] = ((Xmin/average_size)*2+(Xmax/average_size)*2)/2.0f;
+    //vertex_centerxyz[1] = ((Ymin/average_size)*2+(Ymax/average_size)*2)/2.0f;
+    //vertex_centerxyz[2] = ((Zmin/average_size)*2+(Zmax/average_size)*2)/2.0f;
+
+    vertex_centerxyz[0] = (Xmin+Xmax)/average_size;
+    vertex_centerxyz[1] = (Ymin+Ymax)/average_size;
+    vertex_centerxyz[2] = (Zmin+Zmax)/average_size;
 
     fclose(AsciiFile);
 
     (*env).ReleaseStringUTFChars(filename, fileRoot);
     (*env).ReleaseFloatArrayElements(n,normal_array,NULL);
     (*env).ReleaseFloatArrayElements(v,vertex_array,NULL);
-    (*env).ReleaseFloatArrayElements(vm,vertex_min_max,NULL);
+    (*env).ReleaseFloatArrayElements(xyz,vertex_min_max,NULL);
+    (*env).ReleaseFloatArrayElements(centerxyz,vertex_centerxyz,NULL);
 }
 
 
     JNIEXPORT int Java_com_example_administrator_stlload_stlBinaryParser_BinaryParser(
             JNIEnv *env,
-            jobject obj , jstring filename, jfloatArray nor, jfloatArray ver, jfloatArray vm) {
+            jobject obj , jstring filename, jfloatArray nor, jfloatArray ver, jfloatArray xyz,jfloatArray centerxyz) {
 
         const char *fileRoot = (*env).GetStringUTFChars(filename, NULL);
         float* normal_array = (*env).GetFloatArrayElements(nor,NULL);
         float* vertex_array = (*env).GetFloatArrayElements(ver,NULL);
-        float* vertex_min_max = (*env).GetFloatArrayElements(vm,NULL);
+        float* vertex_min_max = (*env).GetFloatArrayElements(xyz,NULL);
+        float* vertex_centerxyz = (*env).GetFloatArrayElements(centerxyz,NULL);
 
         FILE *binaryFile = fopen(fileRoot,"rb");
         char end[2];
@@ -201,20 +216,27 @@ JNIEXPORT void Java_com_example_administrator_stlload_stlASCiiParser_ASCiiParser
         average_size = (fabsf(Xmax-Xmin)+fabsf(Ymax-Ymin)+fabsf(Zmax-Zmin))/3;
 
         for(int x = 0 ; x < i*9 ; x++){
-            vertex_array[x] = vertex_array[x]/average_size;
+            vertex_array[x] = (vertex_array[x]/average_size)*2;
         }
-        vertex_min_max[0] = Xmin/average_size;
-        vertex_min_max[1] = Xmax/average_size;
-        vertex_min_max[2] = Ymin/average_size;
-        vertex_min_max[3] = Ymax/average_size;
-        vertex_min_max[4] = Zmin/average_size;
-        vertex_min_max[5] = Zmax/average_size;
+
+        vertex_min_max[0] = Xmin;
+        vertex_min_max[1] = Xmax;
+        vertex_min_max[2] = Ymin;
+        vertex_min_max[3] = Ymax;
+        vertex_min_max[4] = Zmin;
+        vertex_min_max[5] = Zmax;
+
+        vertex_centerxyz[0] = (Xmin+Xmax)/average_size;
+        vertex_centerxyz[1] = (Ymin+Ymax)/average_size;
+        vertex_centerxyz[2] = (Zmin+Zmax)/average_size;
+
 
         fclose(binaryFile);
         (*env).ReleaseStringUTFChars(filename, fileRoot);
         (*env).ReleaseFloatArrayElements(nor,normal_array,NULL);
         (*env).ReleaseFloatArrayElements(ver,vertex_array,NULL);
-        (*env).ReleaseFloatArrayElements(vm,vertex_min_max,NULL);
+        (*env).ReleaseFloatArrayElements(xyz,vertex_min_max,NULL);
+        (*env).ReleaseFloatArrayElements(centerxyz,vertex_centerxyz,NULL);
 
         return i;
     }
@@ -255,7 +277,6 @@ JNIEXPORT void Java_com_example_administrator_stlload_stlASCiiParser_ASCiiParser
     JNIEXPORT int Java_com_example_administrator_stlload_stlBinaryParser_Faces(JNIEnv *env, jobject instance,
                                                                     jstring filename_) {
         const char *filename = env->GetStringUTFChars(filename_, 0);
-        int size = 0;
         int faces =0;
         FILE *binaryFile = fopen(filename,"rb");
 

@@ -55,7 +55,7 @@ public class stlBinaryParser extends paser{
 		vectexs_min_max = new float[6];  // xmin,xmax,ymin,ymax,zmin,zmax
 		center = new float[3];
 
-		int i = BinaryParser(file.toString(),normals,vectors,vectexs_min_max);
+		int i = BinaryParser(file.toString(),normals,vectors,vectexs_min_max,center);
 
 		/*
 		Log.i("stl- view-","nor_Count="+nor_Count);
@@ -67,9 +67,9 @@ public class stlBinaryParser extends paser{
 		Log.i("stl- view-","zs="+abs(vectexs_min_max[5]-vectexs_min_max[4]));
 		//test 4.17,   3.5,  2.917
 		*/
-		center[0]= (vectexs_min_max[1]+vectexs_min_max[0])/2;
-		center[1]= (vectexs_min_max[3]+vectexs_min_max[2])/2;
-		center[2]= (vectexs_min_max[5]+vectexs_min_max[4])/2;
+		//center[0]= (vectexs_min_max[1]+vectexs_min_max[0])/2;
+		//center[1]= (vectexs_min_max[3]+vectexs_min_max[2])/2;
+		//center[2]= (vectexs_min_max[5]+vectexs_min_max[4])/2;
 
 		/*
 		Log.i("stl- view-","x="+center[0]);
@@ -94,7 +94,7 @@ public class stlBinaryParser extends paser{
 		return center;
 	}
 
-	private native int BinaryParser(String filename, float[] nor, float[] ver, float[] ver_min_max);
+	private native int BinaryParser(String filename, float[] nor, float[] ver, float[] ver_min_max,float[] center);
 	private native int Faces(String filename);
 	
 }
