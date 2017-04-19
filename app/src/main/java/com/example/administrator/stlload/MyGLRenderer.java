@@ -14,7 +14,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private Objectmodel ObjectModel;
     private stlPaser StlObject;
 
-    // mMVPMatrix is an abbreviation for "Model View Projection Matrix"
     private final float[] mMVPMatrix = new float[16];
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
@@ -68,19 +67,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         cameraX = mMoveX;
         cameraY = -mMoveY;
         Matrix.setLookAtM(mViewMatrix, 0, cameraX, cameraY, cameraZ, mMoveX,-mMoveY, 0, 0.0f, 1.0f, 0.0f);
-        /*
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
-        Matrix.setIdentityM(mRotationMatrix, 0);
-        Matrix.rotateM(mRotationMatrix, 0, mAngleX, 0, 1, 0); //X axis
-        Matrix.rotateM(mRotationMatrix, 0, mAngleY, 1, 0, 0); //Y axis
-        //mAngleY = 0.0f;
-        //mAngleX = 0.0f;
-        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
-        Matrix.translateM(scratch,0,-centerPointXYZ[0],-centerPointXYZ[1],-centerPointXYZ[2]);
-        */
-
-        /////////////////////////////////////////
-
         Matrix.setIdentityM(mModelMatrix, 0);
 
         Matrix.setIdentityM(mRotationMatrix, 0);
@@ -94,7 +80,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mTemporaryMatrix, 0, mRotationMatrix, 0, mAccumulatedRotation, 0);
         System.arraycopy(mTemporaryMatrix, 0, mAccumulatedRotation, 0, 16);
 
-        // Rotate the cube taking the overall rotation into account.
         Matrix.multiplyMM(mTemporaryMatrix, 0, mModelMatrix, 0, mAccumulatedRotation, 0);
         System.arraycopy(mTemporaryMatrix, 0, mModelMatrix, 0, 16);
 
@@ -107,8 +92,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
         Matrix.translateM(scratch_2, 0,-centerPointXYZ[0],-centerPointXYZ[1],-centerPointXYZ[2]);
 
-
-        /////////////////////////////////////////
 
         ObjectModel.draw(scratch_1,scratch_2,cameraZ);
 

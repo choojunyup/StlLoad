@@ -87,7 +87,7 @@ public class Objectmodel {
     }
 
     public void draw(float[] mvMatrix,float[] mvpMatrix1,float mSize) {
-        // Add program to OpenGL environment
+
         GLES20.glUseProgram(mProgram);
 
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
@@ -104,7 +104,7 @@ public class Objectmodel {
         GLES20.glUniform3f(mLightPosHandle, 0, 0 ,mSize);
 
 
-        //vboUnUseRun();
+        //vboUnUseRun();  //not use
         vboUseRun();
 
 

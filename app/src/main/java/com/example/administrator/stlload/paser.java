@@ -18,6 +18,10 @@ public class paser {
         return new float[0];
     }
 
+    public int getObjectFaceCnt(){
+        return 0;
+    }
+
     public float[] getObjectCenterPoint() {
         return new float[0];
     }

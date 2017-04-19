@@ -39,6 +39,10 @@ public class stlPaser {
 
     public float[] getCenterPoint() {return STLpaser.getObjectCenterPoint(); }
 
+    public int getFaceCnt(){
+        return STLpaser.getObjectFaceCnt();
+    }
+
     public String getFileFormat(){
         return format;
     }

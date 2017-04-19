@@ -15,7 +15,7 @@ import static java.lang.Math.abs;
 public class stlASCiiParser extends paser{
 
     static {
-       System.loadLibrary("native-lib");
+       System.loadLibrary("STLpaser_C");
     }
 
     float[] vectors;
@@ -69,6 +69,10 @@ public class stlASCiiParser extends paser{
 
     public float[] getObjectCenterPoint(){
         return center;
+    }
+
+    public int getObjectFaceCnt(){
+        return nor_Count;
     }
 
     private native int facas(String s);

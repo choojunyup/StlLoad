@@ -34,6 +34,7 @@ public class FileFinderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         //String ext = Environment.getExternalStorageState();
         //if(!ext.equals(Environment.MEDIA_MOUNTED)){mRoot = Environment.getRootDirectory().getAbsolutePath();}
         //else{mRoot = Environment.getExternalStorageDirectory().getAbsolutePath();}
@@ -43,7 +44,7 @@ public class FileFinderActivity extends AppCompatActivity {
         mAdapter = new ListViewAdapter(this);
         getDir(mRoot);
         mFileList.setAdapter(mAdapter);
-        stlLoad = new Intent(getApplicationContext(),OpenGLES20Activity.class);
+        stlLoad = new Intent(getApplicationContext(),STLViewActivity.class);
 
         mFileList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
