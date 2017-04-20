@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -22,8 +23,7 @@ public class FileFinderActivity extends AppCompatActivity {
 
     private ListView mFileList;
     private ArrayList<ListItem> lTemp = null;
-    private String mRoot = Environment.getExternalStorageDirectory().getAbsolutePath();
-    //private String mRoot = Environment.getRootDirectory().getAbsolutePath();
+    private String mRoot ="";
     private TextView mPath;
     private ListViewAdapter mAdapter = null;
     private String mDirPath;
@@ -34,11 +34,7 @@ public class FileFinderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        //String ext = Environment.getExternalStorageState();
-        //if(!ext.equals(Environment.MEDIA_MOUNTED)){mRoot = Environment.getRootDirectory().getAbsolutePath();}
-        //else{mRoot = Environment.getExternalStorageDirectory().getAbsolutePath();}
-
+        mRoot = rootFind();  // devices find root
         mPath = (TextView)findViewById(R.id.tvPath);
         mFileList = (ListView)findViewById(R.id.filelist);
         mAdapter = new ListViewAdapter(this);
@@ -57,7 +53,7 @@ public class FileFinderActivity extends AppCompatActivity {
                     if(file.canRead()){
                         getDir(fileInfo.getFilePath());
                     }else{
-                        Toast.makeText(FileFinderActivity.this, "good bye~", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(FileFinderActivity.this, "can not read", Toast.LENGTH_SHORT).show();
                     }
                 }else{
                     stlLoad.putExtra("stl_path",fileInfo.getFilePath());
@@ -134,6 +130,20 @@ public class FileFinderActivity extends AppCompatActivity {
 
         }
         mFileList.setAdapter(mAdapter);
+    }
+
+    private String rootFind(){
+        String root = Environment.getExternalStorageDirectory().getAbsolutePath();
+        int end = 0;
+        if(root != null) {
+            root.trim();
+
+            end = root.indexOf('/', 1);
+            root = root.substring(0, end);
+        }else{
+            root = "/storage";
+        }
+        return root;
     }
 
     @Override
